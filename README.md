@@ -84,7 +84,7 @@ Se agradecen las contribuciones para mejorar la biblioteca Files. Si deseas cont
 
 ## Licencia
 
-Esta biblioteca se distribuye bajo la licencia MIT.
+Esta biblioteca se distribuye bajo la licencia GNU.
 
 ## Contacto
 Autor: Alan Guzmán.
