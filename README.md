@@ -68,7 +68,7 @@ $resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true);
 if($resultadoSubida['status']==="success")
 {
     echo $resultadoSubida['status']; //pintara success
-    echo $resultadoSubida['name']; //me regresa el nombre generado del archivo subido 
+    echo $resultadoSubida['name']; // regresa el nombre aleatorio  generado y la extension del archivo subido 
 }
 else
 {
