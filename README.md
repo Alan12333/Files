@@ -42,7 +42,7 @@ Para eliminar un archivo, utiliza la función DeleteFile() pasando la ruta del a
 ```
 <?php
   $url = "source/files/archivo1.jpg;
-  Files::DeleteFile($url); //Se ejecuta la subida del archivo
+  Files::DeleteFile($url); //Se elimina el archivo
 ?>
 ```
 
