@@ -24,6 +24,7 @@ class FilesUpload
     protected $defaultoptions = [
         "min_size"=>0.001,
         "max_size"=>50,
+        "replace"=>true,
         "restricttype" => [
             "doc_type"=>"all",
             "doc_extension" => "all"
@@ -113,6 +114,11 @@ class FilesUpload
     protected $Error_Type;
 
     /**
+     * Variable para identificar si el se reemplazara el archivo
+     */
+    protected $replace = true;
+
+    /**
      * 
      * Toma un arreglo de archivos, la ruta o da la que es por defecto y las opciones la scuales son:
      * 
@@ -132,13 +138,13 @@ class FilesUpload
      * 
      * 
      */
-    public function UploadFile($files=[], $rute="",$options=[],$randname=false, $reemplace = true)
+    public function UploadFile($files=[], $rute="",$options=[],$randname=false)
     {
         if(is_array($rute))
         {
             $this->DefineRoute("");
             $this->file = $files;
-            return $this->UploadFiles($rute,$randname, $reemplace);
+            return $this->UploadFiles($rute, $randname);
         }
         else
         {
@@ -146,7 +152,7 @@ class FilesUpload
             if($this->ValidateRoute())
             {
                 $this->file = $files;
-                return $this->UploadFiles($options,$randname, $reemplace);
+                return $this->UploadFiles($options, $randname);
             }
             else
             {
@@ -155,11 +161,11 @@ class FilesUpload
         }
     }
 
-    private function UploadFiles($options, $rand, $reemplace)
+    private function UploadFiles($options, $rand)
     {
         if($this->CheckOptions($options) == true)
         {
-            return $this->ConstructRute($rand, $reemplace);
+            return $this->ConstructRute($rand);
         }
         else
         {
@@ -225,6 +231,10 @@ class FilesUpload
             //Verifica si el arreglo pasado por parámetros tiene alguna opción
             if(count($options) >=1 )
             {
+                if(isset($options['replace']))
+                {
+                    $this->replace = $options['replace'];
+                }
                 //Valida las 3 opciones minsize, maxsize y el tipo de dato
                 if(isset($options["min_size"])  && isset($options["max_size"])  && isset($options["restricttype"]))
                 {
@@ -306,7 +316,7 @@ class FilesUpload
                 }
 
                 //Se hace un escaneo y comprobacion de las variables $min, $max y $type, si se cumplen algunas o una de estas retorna true
-                return $this->Combinations($min, $options["min_size"], $max, $options["max_size"], $type);
+                return $this->Combinations($min,  $max,  $type, $options);
             }
             else //Si el arreglo viene vació entonces toma las opciones por defecto
             {
@@ -345,7 +355,7 @@ class FilesUpload
     }
 
 
-    private function Combinations($min, $minop, $max, $maxop, $restrict)
+    private function Combinations($min,  $max,  $restrict, $options)
     {
         if($min === true && $max === true)
         {
@@ -361,8 +371,12 @@ class FilesUpload
         }
         else if($max === true)
         {
+            if(!isset($options['min_size']))
+            {
+                $minsize = 0.001;
+            }
             $filezise = number_format($this->file["size"] / (1024 * 1024),3);
-            if($filezise >= $minop)
+            if($filezise >= $minsize)
             {
                 return true;
             }
@@ -374,7 +388,11 @@ class FilesUpload
         else if($min === true)
         {
             $filezise = number_format($this->file["size"] / (1024 * 1024),3);
-            if($filezise <= $max)
+            if(!isset($options['max_size']))
+            {
+                $maxsize = 50;
+            }
+            if($filezise <= $maxsize)
             {
                 return true;
             }
@@ -384,6 +402,10 @@ class FilesUpload
             }
         }
         else if($restrict === true)
+        {
+            return true;
+        }
+        else if(isset($options['replace']))
         {
             return true;
         }
@@ -456,7 +478,7 @@ class FilesUpload
         }
     }
 
-    private function ConstructRute($randname, $reemplace)
+    private function ConstructRute($randname)
     {
         $nuevaruta = "";
         $name = "";
@@ -471,8 +493,9 @@ class FilesUpload
         {
             $name = $this->file['name'];
             $nuevaruta = $this->rute.$this->file['name'];
-            if($reemplace)
+            if($this->replace === false)
             {
+                
                 if(file_exists($nuevaruta))
                 {
                     $newname = $this->DefineNameRandom();
