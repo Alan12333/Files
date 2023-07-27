@@ -9,6 +9,7 @@ Files es una librería básica para PHP que facilita la manipulación de archivo
 - Proporciona opciones para configurar restricciones de tamaño y tipo de archivo.
 - Soporta la generación de nombres aleatorios para los archivos subidos.
 - Permite eliminar archivos de forma sencilla.
+- Permite controlar el reemplazo de archivos
 
 ## Instalación
 1. Descarga el archivo Files.php.
@@ -63,7 +64,10 @@ $options = [
 
 $ruta = "Files/Save/";
 
-$resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true);
+//La opcóon de reemplazar esta activa si se desea crear varias copias del archivo se puede colocar como false el ultimo parametro
+//$resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true, false);
+
+$resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true); 
 
 if($resultadoSubida['status']==="success")
 {
