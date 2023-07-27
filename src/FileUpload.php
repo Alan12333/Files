@@ -132,27 +132,34 @@ class FilesUpload
      * 
      * 
      */
-    public function UploadFile($files=[], $rute="",$options=[],$randname=false)
+    public function UploadFile($files=[], $rute="",$options=[],$randname=false, $reemplace = true)
     {
         if(is_array($rute))
         {
             $this->DefineRoute("");
             $this->file = $files;
-            return $this->UploadFiles($rute,$randname);
+            return $this->UploadFiles($rute,$randname, $reemplace);
         }
         else
         {
             $this->DefineRoute($rute);
-            $this->file = $files;
-            return $this->UploadFiles($options,$randname);
+            if($this->ValidateRoute())
+            {
+                $this->file = $files;
+                return $this->UploadFiles($options,$randname, $reemplace);
+            }
+            else
+            {
+                return $this->Error_Type;
+            }
         }
     }
 
-    private function UploadFiles($options, $rand)
+    private function UploadFiles($options, $rand, $reemplace)
     {
         if($this->CheckOptions($options) == true)
         {
-            return $this->ConstructRute($rand);
+            return $this->ConstructRute($rand, $reemplace);
         }
         else
         {
@@ -164,7 +171,7 @@ class FilesUpload
     {
         if(is_string($file))
         {
-            return $this->BrockRute($file);
+            return $this->BrockenRute($file);
         }
         else
         {
@@ -173,7 +180,7 @@ class FilesUpload
     }
 
     
-    private function BrockRute($rute)
+    private function BrockenRute($rute)
     {
         $array = explode("/",$rute);
         $name="";
@@ -449,7 +456,7 @@ class FilesUpload
         }
     }
 
-    private function ConstructRute($randname)
+    private function ConstructRute($randname, $reemplace)
     {
         $nuevaruta = "";
         $name = "";
@@ -464,6 +471,16 @@ class FilesUpload
         {
             $name = $this->file['name'];
             $nuevaruta = $this->rute.$this->file['name'];
+            if($reemplace)
+            {
+                if(file_exists($nuevaruta))
+                {
+                    $newname = $this->DefineNameRandom();
+                    $nametype = explode(".",$this->file['name']);
+                    $name = $this->file['name']."_".$newname.".".$nametype[1];
+                    $nuevaruta = $this->rute.$name;
+                }
+            }
         }
         if(move_uploaded_file($this->file["tmp_name"], $nuevaruta))
         {
@@ -496,5 +513,18 @@ class FilesUpload
             $finalletter.=$letras[$random];
         }
         return $finalletter;
+    }
+
+    private function ValidateRoute()
+    {
+        if(file_exists($this->rute))
+        {
+            return true;
+        }
+        else
+        {
+            $this->Error_Type = ["status"=>"La ruta es incorrecta o no existe"];
+            return false;
+        }
     }
 }
