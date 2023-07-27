@@ -56,6 +56,7 @@ $archivo = Files::SetFile("archivo");
 $options = [
     "min_size"=>0.010,
     "max_size"=>20,
+    "remplace"=>true,       //Si se desea conservar otra copia del archivo cambiar el valor a false
     "restricttype"=>[
         "doc_type"=>"all",
         "doc_extension"=>"all"
@@ -64,8 +65,7 @@ $options = [
 
 $ruta = "Files/Save/";
 
-//La opcóon de reemplazar esta activa si se desea crear varias copias del archivo se puede colocar como false el ultimo parametro
-//$resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true, false);
+
 
 $resultadoSubida = Files::UploadFile($archivo,$ruta,$options, true); 
 
